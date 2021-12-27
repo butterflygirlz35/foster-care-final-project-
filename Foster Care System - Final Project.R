@@ -31,7 +31,7 @@ Juveniles_IN = select(Juveniles, c('Location', 'TimeFrame', 'Data'))
 # Subsetting United States' Total data
 Juveniles_USA = Juveniles_IN %>% filter((Location == 'United States') & (TimeFrame %in% c('2001', '2003', '2006', '2007', '2010', '2011', '2013', '2015', '2017', '2019')))
 Juveniles_USA = Juveniles_USA %>% mutate(Data = as.numeric(Data))
-Juveniles_USA1 = aggregate(Data~Location, Juveniles_States, sum)
+Juveniles_USA1 = aggregate(Data~Location, Juveniles_USA, sum)
 
 # Subsetting the 10 States' data
 Juveniles_States = Juveniles_IN %>% filter((Location %in% c('Arizona', 'California', 'Colorado', 'Connecticut', 'Georgia', 'Indiana', 'New Jersey', 'Ohio', 'Texas', 'Utah', 'Vermont')) & (TimeFrame %in% c('2001', '2003', '2006', '2007', '2010', '2011', '2013', '2015', '2017', '2019')))
