@@ -25,6 +25,7 @@ Juveniles = Youth_residing_in_juvenile_detention_correctional_and_or_residential
 Juveniles = Juveniles %>% mutate(Data = as.numeric(Data))
 Juveniles = filter(Juveniles, DataFormat != 'Rate per 100,000')
 Juveniles_IN = select(Juveniles, c('Location', 'TimeFrame', 'Data'))
+Juveniles_IN1 = Juveniles_IN %>% filter(Location != 'United States') # Using for Tableau
 Juveniles_IN = Juveniles_IN %>% mutate(Data = as.numeric(Data))
 
 # Subsetting United States' Total data
