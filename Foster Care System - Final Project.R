@@ -27,10 +27,10 @@ Juveniles = Juveniles %>% filter((Location != 'Puerto Rico') & (TimeFrame %in% c
 
 ### Data Exploration graphs
 Tableau_Exiting = select(Exiting_FC, c('Location', 'AgeGroup', 'TimeFrame', 'Data')) # Selecting the four columns wanted for the graphs
-# Dropping the United States rows from the Location column 
-Tableau_Exiting_Graph = Tableau_Exiting %>% filter(Location != 'United States')
-# Selecting the 10 States we chose for Eval Question 1
-Tableau_Exiting_Graph2 = Tableau_Exiting %>% filter((Location %in% c('Arizona', 'California', 'Colorado', 'Connecticut', 'Georgia', 'Indiana', 'Ohio', 'Texas', 'Utah', 'Vermont')))
+# Dropping the United States rows from the Location column and dropping the Total rows from the AgeGroup column
+Tableau_Exiting_Graph = Tableau_Exiting %>% filter((Location != 'United States') & (AgeGroup != 'Total'))
+# Selecting the 10 States and dropping the Total rows from the AgeGroup column
+Tableau_Exiting_Graph2 = Tableau_Exiting %>% filter((Location %in% c('Arizona', 'California', 'Colorado', 'Connecticut', 'Georgia', 'Indiana', 'Ohio', 'Texas', 'Utah', 'Vermont') & (AgeGroup != 'Total')))
 # Exporting the csv files to be used in Tableau for graphing purposes
 write.csv(Tableau_Exiting_Graph, 'C:\\Users\\13612\\Desktop\\Course Final Project\\CSV Dataframes\\Exiting 50 States.csv', row.names=TRUE)
 write.csv(Tableau_Exiting_Graph2, 'C:\\Users\\13612\\Desktop\\Course Final Project\\CSV Dataframes\\Exiting 10 States.csv', row.names=TRUE)
