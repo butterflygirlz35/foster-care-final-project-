@@ -13,19 +13,22 @@ Juveniles_2 = read.csv('C:/Users/13612/Desktop/Course Final Project/Assignments/
 ##### Shared Data wrangling for the Evaluation Questions
 
 ## Exiting the Foster Care System dataset
+Exiting_Age = names(Exiting_FC)[names(Exiting_FC) == 'Age group'] <- "AgeGroup" # Changing the Age Group column to AgeGroup to avoid conflicts with codes
 Exiting_FC = filter(Exiting_FC, DataFormat != 'Percent') # Getting rid of the percent rows in the DataFormat column
 Exiting_FC = Exiting_FC %>% mutate(Data = as.numeric(Data)) # Changing the Data from a character to a numeric format
+# Filtering out only the 10 years that are needed and dropping the Puerto Rico rows from the Location column
+Exiting_FC = Exiting_FC %>% filter((Location != 'Puerto Rico') & (TimeFrame %in% c('2001', '2003', '2006', '2007', '2010', '2011', '2013', '2015', '2017', '2019')))
 
 ## Juvenile incarceration dataset
 Juveniles = filter(Juveniles, DataFormat != 'Rate per 100,000') # Dropping the Rate per 100,000 rows in the DataFormat column
 Juveniles = Juveniles %>% mutate(Data = as.numeric(Data)) # Changing the Data from a character to a numeric format
+# Filtering out only the 10 years that are needed and dropping the Puerto Rico rows from the Location column
+Juveniles = Juveniles %>% filter((Location != 'Puerto Rico') & (TimeFrame %in% c('2001', '2003', '2006', '2007', '2010', '2011', '2013', '2015', '2017', '2019')))
 
-
-### Shared Data Exploration graphs
-Tableau_Exiting = select(Exiting_FC, c('Location', 'Age group', 'TimeFrame', 'Data')) # Selecting the four columns wanted for the graphs
-# Dropping the United States and Puerto Rico rows from the Location column and selecting the desired years in the TimeFrame column
+### Data Exploration graphs
+Tableau_Exiting = select(Exiting_FC, c('Location', 'AgeGroup', 'TimeFrame', 'Data')) # Selecting the four columns wanted for the graphs
+# Dropping the United States rows from the Location column 
 Tableau_Exiting_Graph = Tableau_Exiting %>% filter(Location != 'United States')
-Tableau_Exiting_Graph = Tableau_Exiting %>% filter((Location != 'Puerto Rico') & (TimeFrame %in% c('2001', '2003', '2006', '2007', '2010', '2011', '2013', '2015', '2017', '2019')))
 # Selecting the 10 States we chose for Eval Question 1
 Tableau_Exiting_Graph2 = Tableau_Exiting %>% filter((Location %in% c('Arizona', 'California', 'Colorado', 'Connecticut', 'Georgia', 'Indiana', 'Ohio', 'Texas', 'Utah', 'Vermont')))
 # Exporting the csv files to be used in Tableau for graphing purposes
@@ -34,9 +37,8 @@ write.csv(Tableau_Exiting_Graph2, 'C:\\Users\\13612\\Desktop\\Course Final Proje
 
 
 Tableau_Juveniles = select(Juveniles, c('Location', 'TimeFrame', 'Data')) # Selecting the three columns wanted for the graphs
-# Dropping the United States and Puerto Rico rows from the Location column and selecting the desired years in the TimeFrame column
+# Dropping the United States rows from the Location column
 Tableau_Juveniles_Graph = Tableau_Juveniles %>% filter(Location != 'United States')
-Tableau_Juveniles_Graph = Tableau_Juveniles %>% filter((Location != 'Puerto Rico') & (TimeFrame %in% c('2001', '2003', '2006', '2007', '2010', '2011', '2013', '2015', '2017', '2019')))
 # Selecting the 10 States we chose for Eval Question 1
 Tableau_Juveniles_Graph2 = Tableau_Juveniles %>% filter((Location %in% c('Arizona', 'California', 'Colorado', 'Connecticut', 'Georgia', 'Indiana', 'Ohio', 'Texas', 'Utah', 'Vermont')))
 # Exporting the csv files to be used in Tableau for graphing purposes
@@ -50,13 +52,13 @@ write.csv(Tableau_Juveniles_Graph2, 'C:\\Users\\13612\\Desktop\\Course Final Pro
 ### Data Wrangling
 
 ## Exiting the Foster Care System dataset
-Exiting_FC1 = select(Exiting_FC, c('Location', 'Data')) # Selecting the two columns needed for analysis
-# Selecting the 10 States we chose
-Exiting_States = Exiting_FC1 %>% filter((Location %in% c('Arizona', 'California', 'Colorado', 'Connecticut', 'Georgia', 'Indiana', 'Ohio', 'Texas', 'Utah', 'Vermont')))
+Exiting_FC1 = select(Exiting_FC, c('Location', 'AgeGroup', 'TimeFrame', 'Data')) # Selecting the two columns needed for analysis
+# Selecting the 10 States we chose 
+Exiting_States = Exiting_FC1 %>% filter((Location %in% c('Arizona', 'California', 'Colorado', 'Connecticut', 'Georgia', 'Indiana', 'Ohio', 'Texas', 'Utah', 'Vermont') & (AgeGroup == 'Total')))
 Exiting_States1 = aggregate(Data~Location, Exiting_States, sum) # Getting the sum of the Data column for all years combined
 
 ## Youth Incarceration dataset
-Juveniles_IN = select(Juveniles, c('Location', 'Data')) # Selecting the two columns needed for analysis
+Juveniles_IN = select(Juveniles, c('Location', 'TimeFrame', 'Data')) # Selecting the two columns needed for analysis
 # Selecting the 10 States we chose
 Juveniles_States = Juveniles_IN %>% filter((Location %in% c('Arizona', 'California', 'Colorado', 'Connecticut', 'Georgia', 'Indiana', 'Ohio', 'Texas', 'Utah', 'Vermont')))
 Juveniles_States1 = aggregate(Data~Location, Juveniles_States, sum) # Getting the sum of the Data column for all years combined
@@ -64,11 +66,22 @@ Juveniles_States1 = aggregate(Data~Location, Juveniles_States, sum) # Getting th
 ### Data Analysis
 
 ## Testing assumptions
-CrossTable(Exiting_States1$Data, Juveniles_States1$Data, fisher=TRUE, chisq = TRUE, expected = TRUE, sresid = TRUE, format='SPSS')
+
+# Using dataframes with all years present
+CrossTable(Exiting_States$Location, Juveniles_States$Data, fisher=TRUE, chisq = TRUE, expected = TRUE, sresid = TRUE, format='SPSS')
 
 ## Conclusions
-# The p-value is .02313417, which is greater than .05 making this analysis not significant. Also no cells have any values > 5
-# There is no influence from children leaving foster care by state to the incarceration numbers.
+# The p-value is .4273901, which is > .05 making this analysis not significant.  No cells have any values > 5, also failing the assumptions
+# Checking to see if an analysis with the years aggregated together changes the results
+
+# Using dataframes with years aggregated together
+CrossTable(Exiting_States1$Location, Juveniles_States1$Data, fisher=TRUE, chisq = TRUE, expected = TRUE, sresid = TRUE, format='SPSS')
+
+## Conclusions
+# The p-value is .2313417, which is < .05 making this analysis not significant. No cells have any values < 5, also failing the assumptions
+# There is no influence from children leaving foster care by state to juvenile incarceration numbers.
+# Having the years aggregated together did change the p-value but not in any significant way
+
 
 
 #### Evaluation Question 2: " Does the age group of children exiting foster care have an influence on juvenile incarceration numbers?"
@@ -76,7 +89,6 @@ CrossTable(Exiting_States1$Data, Juveniles_States1$Data, fisher=TRUE, chisq = TR
 ### Data Wrangling
 
 ## Exiting the Foster Care System dataset
-Exiting_Age = names(Exiting_FC)[names(Exiting_FC) == 'Age group'] <- "AgeGroup" # Changing the Age Group column so avoid confusion with codes
 Exiting_FC2 = select(Exiting_FC, c('Location', 'AgeGroup', 'Data')) # Selecting the two columns needed for analysis
 Exiting_USA = Exiting_FC2 %>% filter((Location == 'United States') & (AgeGroup != 'Total')) # Filtering only United States from the Location column and dropping the Total rows from the AgeGroup columns
 Exiting_USA1 = aggregate(Data~Location + AgeGroup, Exiting_USA, sum) # Getting the sum of the Data column for all years combined
@@ -86,7 +98,7 @@ Exiting_USA2 <- read.csv("C:/Users/13612/Desktop/Course Final Project/Assignment
 
 ## Youth incarceration dataset
 Juveniles_USA = select(Juveniles_2, c('AgeGroup', 'Data')) #Keeping only the two needed columns for analysis
-Juveniles_USA$Location = 'United States' # Adding a the Location column
+Juveniles_USA$Location = 'United States' # Adding the Location column
 Juveniles_USA = na.omit(Juveniles_USA) # Dropping any na rows
 Juveniles_USA1 = Juveniles_USA[, c(3,1,2)] # Reorganizing the columns to match Exiting_USA2 dataframe
 
@@ -96,5 +108,5 @@ Juveniles_USA1 = Juveniles_USA[, c(3,1,2)] # Reorganizing the columns to match E
 CrossTable(Exiting_USA2$AgeGroup, Juveniles_USA1$Data, fisher=TRUE, chisq = TRUE, expected = TRUE, sresid = TRUE, format='SPSS')
 
 ## Conclusions
-# The p-value is .1572992, which is < .05, making this analysis not significant.  Also no cells have any values > 5
-# There is no influence from children leaving foster care by age group to the incarceration numbers
+# The p-value is .1572992, which is < .05, making this analysis not significant.  No cells have any values < 5, also failing the assumptions
+# There is no influence from children leaving foster care by age group to juvenile incarceration numbers
